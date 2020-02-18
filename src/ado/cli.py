@@ -17,10 +17,20 @@ Why does this file exist, and why not put this in __main__?
 import argparse
 
 parser = argparse.ArgumentParser(description='Command description.')
+parser.add_argument(
+    'flow_name',
+    type=str,
+    help='python flow file location')
 parser.add_argument('names', metavar='NAME', nargs=argparse.ZERO_OR_MORE,
                     help="A name of something.")
+
+
+def createJSON(file_path):
+    with open(file_path + "/steps.json", "w") as f:
+        f.write('{"hello":"world"}')
 
 
 def main(args=None):
     args = parser.parse_args(args=args)
     print(args.names)
+    createJSON(args.flow_name)
