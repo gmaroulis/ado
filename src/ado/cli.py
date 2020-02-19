@@ -15,7 +15,7 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import argparse
-from state_machine_exractor import generate_state_machine_template
+from ado.state_machine_exractor import generate_state_machine_template
 
 parser = argparse.ArgumentParser(description='Command description.')
 parser.add_argument(
@@ -25,6 +25,13 @@ parser.add_argument(
 parser.add_argument('names', metavar='NAME', nargs=argparse.ZERO_OR_MORE,
                     help="A name of something.")
 
+parser.add_argument('-p', '--path',
+                      help='path to flow.py file')
+parser.add_argument('-n', '--name',
+                      help='name of the state machine')
+parser.add_argument('-aws', '--aws',
+                      help='aws account number')
+
 
 def createJSON(file_path):
     with open(file_path + "/steps.json", "w") as f:
@@ -33,6 +40,4 @@ def createJSON(file_path):
 
 def main(args=None):
     args = parser.parse_args(args=args)
-    generate_state_machine_template(args.names)
-    print(args.names)
-    createJSON(args.flow_name)
+    generate_state_machine_template(args)
