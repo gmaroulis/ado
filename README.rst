@@ -51,7 +51,7 @@ Installation
 
 You can also install the in-development version with::
 
-    pip install https://github.com/itsvipa/ado/archive/master.zip
+    pip install https://github.com/gmaroulis/ado/archive/master.zip
 
 
 Documentation
