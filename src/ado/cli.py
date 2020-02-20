@@ -22,13 +22,9 @@ parser = argparse.ArgumentParser(description='Command description.')
 parser.add_argument('names', metavar='NAME', nargs=argparse.ZERO_OR_MORE,
                     help="A name of something.")
 
-parser.add_argument('-p', '--path',
-                      help='path to flow.py file')
-parser.add_argument('-n', '--name',
-                      help='name of the state machine')
-parser.add_argument('-aws', '--aws',
-                      help='aws account number')
-
+parser.add_argument('-p', '--path', nargs=argparse.ZERO_OR_MORE, help='path to flow.py file')
+parser.add_argument('-n', '--name', nargs=argparse.ZERO_OR_MORE, help='name of the state machine')
+parser.add_argument('-aws', '--aws', nargs=argparse.ZERO_OR_MORE, help='aws account number')
 
 def main(args=None):
     args = parser.parse_args(args=args)
