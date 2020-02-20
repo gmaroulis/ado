@@ -24,11 +24,11 @@ def process_args(args):
         aws_account = args[2]
 
     if args.aws:
-        aws_account = args.aws
+        aws_account = args.aws[0]
     if args.path:
-        basepath = args.path
+        basepath = args.path[0]
     if args.name:
-        sfn_name = args.name
+        sfn_name = args.name[0]
 
     return basepath, sfn_name, aws_account
 
