@@ -15,12 +15,19 @@ Why does this file exist, and why not put this in __main__?
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
 import argparse
+from ado.state_machine_extractor import generate_state_machine_template
 
 parser = argparse.ArgumentParser(description='Command description.')
+
 parser.add_argument('names', metavar='NAME', nargs=argparse.ZERO_OR_MORE,
                     help="A name of something.")
 
+parser.add_argument('-p', '--path', nargs=argparse.ZERO_OR_MORE, help='path to flow.py file')
+parser.add_argument('-n', '--name', nargs=argparse.ZERO_OR_MORE, help='name of the state machine')
+parser.add_argument('-aws', '--aws', nargs=argparse.ZERO_OR_MORE, help='aws account number')
+
 
 def main(args=None):
+    """Generate the state machine."""
     args = parser.parse_args(args=args)
-    print(args.names)
+    generate_state_machine_template(args)
