@@ -41,7 +41,7 @@ def generate_state_machine_template(args):
     source_flow = importlib.import_module('flow')
     try:
         source_flow = source_flow.Flow('', '')
-    except Exception as exc:
+    except Exception:
         source_flow = source_flow.Flow()
 
     dependencies = get_dependencies(source_flow)
@@ -95,17 +95,17 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
         'StartAt': None,
         'States': {}}
     lambdas = []
-    list_dependencies = list(dependencies.keys())
     lambda_arn_template = 'arn:aws:lambda:us-east-1:{aws_account}:function:{env}-{k}'
 
     print(dependencies)
     states = build_states(dependencies)
     list_stages = list(states.keys())
 
-
     for i, k in enumerate(states):
         lambda_function_arn = lambda_arn_template.format(env=ENV, k=k, aws_account=aws_account)
         lambdas.append(lambda_function_arn)
+        job_definition = "arn:aws:batch:us-east-1:103233932089:job-definition/vikash-hello-world-garcon:1"
+        job_queue = "arn:aws:batch:us-east-1:103233932089:job-queue/vikash-hello-world"
 
         key = k
 
@@ -121,9 +121,12 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                     "Type": "Task",
                     "Resource": "arn:aws:states:::batch:submitJob.sync",
                     "Parameters": {
-                        "JobDefinition": "arn:aws:batch:REGION:ACCOUNT_ID:job-definition/testJobDefinition",
-                        "JobName": "myJobName",
-                        "JobQueue": "arn:aws:batch:REGION:ACCOUNT_ID:job-queue/testQueue"
+                        "JobDefinition": job_definition,
+                        "JobName": key,
+                        "JobQueue": job_queue,
+                        "ContainerOverrides": {
+                            "command": ["garcon-activity-local -i flow -c Flow run {}".format(key)]
+                            }
                         },
                     "End": True
                     }
@@ -139,9 +142,12 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                         "Type": "Task",
                         "Resource": "arn:aws:states:::batch:submitJob.sync",
                         "Parameters": {
-                            "JobDefinition": "arn:aws:batch:REGION:ACCOUNT_ID:job-definition/testJobDefinition",
-                            "JobName": "myJobName",
-                            "JobQueue": "arn:aws:batch:REGION:ACCOUNT_ID:job-queue/testQueue"
+                            "JobDefinition": job_definition,
+                            "JobName": branch,
+                            "JobQueue": job_queue,
+                            "ContainerOverrides": {
+                                "command": ["garcon-activity-local -i flow -c Flow run {}".format(branch)]
+                            }
                             },
                         "End": True
                     }
@@ -149,7 +155,6 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                     branches.append(new_branch)
 
                 state_machine['States'][key] = {
-                    "Comment": "A Parallel state can be used to create parallel branches of execution in your state machine.",
                     "Type": "Parallel",
                     "End": True,
                     "Branches": branches
@@ -164,9 +169,12 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                     "Type": "Task",
                     "Resource": "arn:aws:states:::batch:submitJob.sync",
                     "Parameters": {
-                        "JobDefinition": "arn:aws:batch:REGION:ACCOUNT_ID:job-definition/testJobDefinition",
-                        "JobName": "myJobName",
-                        "JobQueue": "arn:aws:batch:REGION:ACCOUNT_ID:job-queue/testQueue"
+                        "JobDefinition": job_definition,
+                        "JobName": key,
+                        "JobQueue": job_queue,
+                        "ContainerOverrides": {
+                            "command": ["garcon-activity-local -i flow -c Flow run {}".format(key)]
+                            }
                         },
                     "Next": next_key
                     }
@@ -182,9 +190,12 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                         "Type": "Task",
                         "Resource": "arn:aws:states:::batch:submitJob.sync",
                         "Parameters": {
-                            "JobDefinition": "arn:aws:batch:REGION:ACCOUNT_ID:job-definition/testJobDefinition",
-                            "JobName": "myJobName",
-                            "JobQueue": "arn:aws:batch:REGION:ACCOUNT_ID:job-queue/testQueue"
+                            "JobDefinition": job_definition,
+                            "JobName": branch,
+                            "JobQueue": job_queue,
+                            "ContainerOverrides": {
+                                "command": ["garcon-activity-local -i flow -c Flow run {}".format(branch)]
+                            }
                             },
                         "End": True
                     }
@@ -192,7 +203,6 @@ def get_state_machine(dependencies, source_flow, sfn_name, aws_account):
                     branches.append(new_branch)
 
                 state_machine['States'][key] = {
-                    "Comment": "A Parallel state can be used to create parallel branches of execution in your state machine.",
                     "Type": "Parallel",
                     "Next": next_key,
                     "Branches": branches
